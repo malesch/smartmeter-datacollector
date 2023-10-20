@@ -36,6 +36,7 @@ class MqttConfig:
     check_hostname: bool = True
     client_cert_path: Optional[str] = None
     client_key_path: Optional[str] = None
+    send_value_only: bool = False
 
     def with_tls(self, ca_cert_path: Optional[str] = None, check_hostname: bool = True) -> "MqttConfig":
         self.use_tls = True
@@ -54,6 +55,10 @@ class MqttConfig:
         self.client_key_path = key_path
         return self
 
+    def set_send_value_only(self, flag: bool) -> "MqttConfig":
+        self.send_value_only = flag
+        return self
+
     @staticmethod
     def from_sink_config(config: SectionProxy) -> "MqttConfig":
         mqtt_cfg = MqttConfig(config.get("host"), config.getint("port", 1883))
@@ -68,6 +73,7 @@ class MqttConfig:
                 config.get("client_cert_path"),
                 config.get("client_key_path")
             )
+        mqtt_cfg.set_send_value_only(config.getboolean("send_value_only", False))
         return mqtt_cfg
 
 
@@ -87,6 +93,8 @@ class MqttDataSink(DataSink):
         if config.username and config.password:
             user_pass_auth["username"] = config.username
             user_pass_auth["password"] = config.password
+
+        self._send_value_only = config.send_value_only
 
         self._client = Client(
             hostname=config.broker_host,
@@ -128,8 +136,12 @@ class MqttDataSink(DataSink):
         topic = MqttDataSink.get_topic_name_for_datapoint(data_point)
         dp_json = self.data_point_to_mqtt_json(data_point)
         try:
-            await self._client.publish(topic, dp_json)
-            LOGGER.debug("%s sent to MQTT broker.", dp_json)
+            if self._send_value_only:
+                await self._client.publish(topic, data_point.value)
+                LOGGER.debug("%s sent to MQTT broker (%s).", data_point.value, dp_json)
+            else:
+                await self._client.publish(topic, dp_json)
+                LOGGER.debug("%s sent to MQTT broker.", dp_json)
         except ValueError as ex:
             LOGGER.error("MQTT payload or topic is invalid: '%s'", ex)
         except MqttCodeError as ex:

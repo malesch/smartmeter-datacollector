@@ -36,6 +36,7 @@ DEFAULT_CONFIG = {
         'password': "",
         'client_cert_path': "",
         'client_key_path': "",
+        'send_value_only': False,
     },
     'logging': {
         'default': 'DEBUG',
