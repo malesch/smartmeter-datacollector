@@ -31,6 +31,9 @@ def build_meters(config: ConfigParser) -> List[Meter]:
                 meters.append(LGE450(
                     port=meter_config.get('port', "/dev/ttyUSB0"),
                     baudrate=meter_config.getint('baudrate', LGE450.BAUDRATE),
+                    data_bits=meter_config.getint('data_bits', LGE450.DATA_BITS),
+                    parity=meter_config.get('parity', LGE450.PARITY),
+                    stop_bits=meter_config.getint('stop_bits', LGE450.STOP_BITS),
                     decryption_key=meter_config.get('key'),
                     use_system_time=meter_config.getboolean('systemtime', False)
                 ))
@@ -38,6 +41,9 @@ def build_meters(config: ConfigParser) -> List[Meter]:
                 meters.append(LGE360(
                     port=meter_config.get('port', "/dev/ttyUSB0"),
                     baudrate=meter_config.getint('baudrate', LGE360.BAUDRATE),
+                    data_bits=meter_config.getint('data_bits', LGE360.DATA_BITS),
+                    parity=meter_config.get('parity', LGE360.PARITY),
+                    stop_bits=meter_config.getint('stop_bits', LGE360.STOP_BITS),
                     decryption_key=meter_config.get('key'),
                     use_system_time=meter_config.getboolean('systemtime', False)
                 ))
@@ -45,13 +51,19 @@ def build_meters(config: ConfigParser) -> List[Meter]:
                 meters.append(IskraAM550(
                     port=meter_config.get('port', "/dev/ttyUSB0"),
                     baudrate=meter_config.getint('baudrate', IskraAM550.BAUDRATE),
+                    data_bits=meter_config.getint('data_bits', IskraAM550.DATA_BITS),
+                    parity=meter_config.get('parity', IskraAM550.PARITY),
+                    stop_bits=meter_config.getint('stop_bits', IskraAM550.STOP_BITS),
                     decryption_key=meter_config.get('key'),
                     use_system_time=meter_config.getboolean('systemtime', False)
                 ))
             elif meter_type == "kamstrup_han":
                 meters.append(KamstrupHAN(
                     port=meter_config.get('port', "/dev/ttyUSB0"),
-                    baudrate=meter_config.getint('baudrate', KamstrupHAN.BAUDRATE),
+                    baudrate=meter_config.getint('baudrate', Kamstrup.BAUDRATE),
+                    data_bits=meter_config.getint('data_bits', Kamstrup.DATA_BITS),
+                    parity=meter_config.get('parity', Kamstrup.PARITY),
+                    stop_bits=meter_config.getint('stop_bits', Kamstrup.STOP_BITS),
                     decryption_key=meter_config.get('key'),
                     use_system_time=meter_config.getboolean('systemtime', False)
                 ))
