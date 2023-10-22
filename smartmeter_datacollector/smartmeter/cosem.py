@@ -92,6 +92,12 @@ DEFAULT_REGISTER_MAPPING = [
     RegisterCosem(OBISCode(1, 0, 8, 8, 0), MeterDataPointTypes.REACTIVE_ENERGY_Q4.value),
     RegisterCosem(OBISCode(1, 0, 8, 8, 1), MeterDataPointTypes.REACTIVE_ENERGY_Q4_T1.value),
     RegisterCosem(OBISCode(1, 0, 8, 8, 2), MeterDataPointTypes.REACTIVE_ENERGY_Q4_T2.value),
+
+    RegisterCosem(OBISCode(1, 1, 1, 8, 1), MeterDataPointTypes.ACTIVE_ENERGY_P_Q1Q4_T1.value),
+    RegisterCosem(OBISCode(1, 1, 1, 8, 2), MeterDataPointTypes.ACTIVE_ENERGY_P_Q1Q4_T2.value),
+    RegisterCosem(OBISCode(1, 1, 2, 8, 1), MeterDataPointTypes.ACTIVE_ENERGY_N_Q2Q3_T1.value),
+    RegisterCosem(OBISCode(1, 1, 2, 8, 2), MeterDataPointTypes.ACTIVE_ENERGY_N_Q2Q3_T2.value),
+
 ]
 
 
