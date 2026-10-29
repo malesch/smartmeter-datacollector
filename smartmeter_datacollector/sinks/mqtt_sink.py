@@ -34,6 +34,7 @@ class MqttConfig:
     client_cert_path: Optional[str] = None
     client_key_path: Optional[str] = None
     topic_group: str = "building"
+    send_value_only: bool = False
 
     def with_tls(
         self, ca_cert_path: Optional[str] = None, check_hostname: bool = True
@@ -52,6 +53,10 @@ class MqttConfig:
         self.use_tls = True
         self.client_cert_path = cert_path
         self.client_key_path = key_path
+        return self
+
+    def set_send_value_only(self, flag: bool) -> "MqttConfig":
+        self.send_value_only = flag
         return self
 
     @staticmethod
@@ -76,6 +81,7 @@ class MqttConfig:
         topic_group = config.get("topic_group")
         if topic_group and topic_group.strip().isalnum():
             mqtt_cfg.topic_group = topic_group.strip()
+        mqtt_cfg.set_send_value_only(config.getboolean("send_value_only", False))
         return mqtt_cfg
 
 
@@ -92,6 +98,8 @@ class MqttDataSink(DataSink):
                 config.client_cert_path,
                 config.client_key_path,
             )
+
+        self._send_value_only = config.send_value_only
 
         self._client = Client(
             hostname=config.broker_host,
@@ -146,8 +154,11 @@ class MqttDataSink(DataSink):
     async def send(self, data_bundle: MeterDataBundle) -> None:
         for data_point in data_bundle.data_points:
             topic = MqttDataSink.get_topic_name_for_datapoint(data_point, data_bundle.source)
-            dp_json = self.data_point_to_mqtt_json(data_point, int(data_bundle.timestamp.timestamp()))
-            await self._publish_with_retries(topic, dp_json, retries=self.RETRIES)
+            if self._send_value_only:
+                await self._publish_with_retries(topic, data_point.value, retries=self.RETRIES)
+            else:
+                dp_json = self.data_point_to_mqtt_json(data_point, int(data_bundle.timestamp.timestamp()))
+                await self._publish_with_retries(topic, dp_json, retries=self.RETRIES)
 
     async def _connection_handler(self) -> None:
         while True:
