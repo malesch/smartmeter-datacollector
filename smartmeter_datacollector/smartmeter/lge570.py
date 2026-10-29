@@ -22,17 +22,23 @@ LOGGER = logging.getLogger("smartmeter")
 
 class LGE570(SerialHdlcDlmsMeter):
     BAUDRATE = 2400
+    DATA_BITS = serial.EIGHTBITS
+    PARITY = serial.PARITY_EVEN
+    STOP_BITS = serial.STOPBITS_ONE
 
     def __init__(self, port: str,
                  baudrate: int = BAUDRATE,
+                 data_bits: int,
+                 parity: str,
+                 stop_bits: int,
                  decryption_key: Optional[str] = None,
                  use_system_time: bool = False) -> None:
         serial_config = SerialConfig(
             port=port,
             baudrate=baudrate,
-            data_bits=serial.EIGHTBITS,
-            parity=serial.PARITY_EVEN,
-            stop_bits=serial.STOPBITS_ONE,
+            data_bits=data_bits,
+            parity=parity,
+            stop_bits=stop_bits,
             termination=SerialHdlcDlmsMeter.HDLC_FLAG
         )
         current_registers = [
